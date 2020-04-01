@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <OpenTapPackageDefinitionPath>package.xml</OpenTapPackageDefinitionPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalOpenTapPackage Include="Developer's System CE" />
+    <!--<AdditionalOpenTapPackage Include="Developer's System" />-->
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenTAP" Version="9.4.0" />
+  </ItemGroup>
+
+</Project>

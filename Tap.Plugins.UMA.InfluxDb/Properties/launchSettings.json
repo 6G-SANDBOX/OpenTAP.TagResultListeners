@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "OpenTAP Editor": {
+      "commandName": "Executable",
+      "executablePath": "./tap.exe",
+      "commandLineArgs": "editor",
+      "workingDirectory": "./bin/Debug",
+      "environmentVariables": { "OPENTAP_DEBUGGER_ASSEMBLY": "Packages/Visual Studio SDK CE/OpenTap.VSSdk.Debugger.dll" }
+    }
+  }
+}
