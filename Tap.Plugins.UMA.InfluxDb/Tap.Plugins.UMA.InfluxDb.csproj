@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="InfluxDB.LineProtocol" Version="1.1.0" />
     <PackageReference Include="OpenTAP" Version="9.4.0" />
   </ItemGroup>
 
