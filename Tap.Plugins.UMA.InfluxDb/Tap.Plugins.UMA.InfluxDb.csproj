@@ -13,17 +13,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <AdditionalOpenTapPackage Include="Developer's System CE" />
-    <!--<AdditionalOpenTapPackage Include="Developer's System" />-->
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="OpenTAP" Version="9.12.3" />
     <PackageReference Include="InfluxDB.LineProtocol" Version="1.1.0" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo  Copying TapPackage to TAP folder (if exist)&#xD;&#xA;echo  Consider that this step runs before packaging, so a previous build will be moved&#xD;&#xA;IF EXIST &quot;$(TargetDir)/*.TapPackage&quot; copy  /Y &quot;$(TargetDir)/*.TapPackage&quot; &quot;$(TAP_PATH)&quot;" />
-  </Target>
 
 </Project>

@@ -7,7 +7,7 @@ For Version the following macro is available (Only works if the project director
 $(GitVersion) - Gets the version from Git in the recommended format Major.Minor.Build-PreRelease+CommitHash.BranchName.
 -->
 <Package Name="Tap.Plugins.UMA.InfluxDb" OS="Windows,Linux,OSX" Architecture="AnyCPU" xmlns="http://opentap.io/schemas/package"
-         Version="1.0.0">
+         Version="1.0.1">
   <Description>InfluxDB result listener</Description>
   <Files>
     <File Path="Packages/Tap.Plugins.UMA.InfluxDb/Tap.Plugins.UMA.InfluxDb.dll" SourcePath="Tap.Plugins.UMA.InfluxDb.dll">
