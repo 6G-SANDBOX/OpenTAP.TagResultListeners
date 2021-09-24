@@ -6,12 +6,12 @@ Version: The version of the package. Must be in a semver 2.0 compatible format. 
 For Version the following macro is available (Only works if the project directory is under Git source control):
 $(GitVersion) - Gets the version from Git in the recommended format Major.Minor.Build-PreRelease+CommitHash.BranchName.
 -->
-<Package Name="Tap.Plugins.UMA.InfluxDb" OS="Windows,Linux,OSX" Architecture="AnyCPU" xmlns="http://opentap.io/schemas/package"
-         Version="1.0.1">
-  <Description>InfluxDB result listener</Description>
+<Package Name="OpenTap.Plugins.UMA.ResultListeners" Version="0.1.0-alpha" OS="Windows,Linux" Architecture="AnyCPU" xmlns="http://opentap.io/schemas/package">
+  <Description>This is my OpenTAP plugin package.</Description>
   <Files>
-    <File Path="Packages/Tap.Plugins.UMA.InfluxDb/Tap.Plugins.UMA.InfluxDb.dll" SourcePath="Tap.Plugins.UMA.InfluxDb.dll">
+    <File Path="Packages/OpenTap.Plugins.UMA.ResultListeners/OpenTap.Plugins.UMA.ResultListeners.dll" SourcePath="OpenTap.Plugins.UMA.ResultListeners.dll">
       <SetAssemblyInfo Attributes="Version"/>
+      <!--ObfuscateWithDotfuscator/-->
     </File>
   </Files>
 </Package>

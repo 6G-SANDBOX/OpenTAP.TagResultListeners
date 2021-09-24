@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Tap.Plugins.UMA.InfluxDb")]
+[assembly: AssemblyTitle("OpenTap.Plugins.UMA.ResultListeners")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Tap.Plugins.UMA.InfluxDb")]
-[assembly: AssemblyCopyright("Copyright ©  2020")]
+[assembly: AssemblyProduct("OpenTap.Plugins.UMA.ResultListeners")]
+[assembly: AssemblyCopyright("Copyright ©  2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("4a6dd8a0-996f-4a58-837f-75354727fd14")]
+[assembly: Guid("33a82028-13ea-4ff9-bc7c-7f8c12ddf340")]
 
 // Version information for an assembly consists of the following four values:
 //
