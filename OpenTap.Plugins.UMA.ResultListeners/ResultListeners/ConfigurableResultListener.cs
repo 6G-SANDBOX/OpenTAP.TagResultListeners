@@ -4,11 +4,12 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using OpenTap;
 
-namespace Tap.Plugins.UMA.ResultListeners
+namespace OpenTap.Plugins.UMA.ResultListeners
 {
     public abstract class ConfigurableResultListenerBase : ResultListener
     {
@@ -97,6 +98,48 @@ namespace Tap.Plugins.UMA.ResultListeners
         public string Sanitize(string value, string replacement)
         {
             return VALID_CHARS.Replace(value, replacement);
+        }
+
+        internal DateTime? getDateTime( Dictionary<string, IConvertible> dict ) {
+            // Try to find the timestamp key
+            List<string> keys = new List<string>( dict.Keys );
+            string timestampKey = keys.Find( ( key ) => ( key.ToUpper() == "TIMESTAMP" ) );
+
+            if ( timestampKey != null ) {
+                IConvertible value = dict[timestampKey];
+
+                if ( value != null ) {
+                    long milliseconds;
+
+                    switch ( value.GetTypeCode() ) {
+                        case TypeCode.Int16:
+                        case TypeCode.Int32:
+                        case TypeCode.Int64:
+                        case TypeCode.UInt16:
+                        case TypeCode.UInt32:
+                        case TypeCode.UInt64:
+                            milliseconds = value.ToInt64( null );
+                            break;
+                        case TypeCode.Double:
+                            milliseconds = (long)( value.ToDouble( null ) * 1000 );
+                            break;
+                        default: return null;
+                    }
+                    return DateTimeOffset.FromUnixTimeMilliseconds( milliseconds ).UtcDateTime;
+                }
+            }
+            return null;
+        }
+
+        internal IEnumerable<Dictionary<string, IConvertible>> getRows( ResultTable table ) {
+            for ( int r = 0; r < table.Rows; r++ ) {
+                Dictionary<string, IConvertible> res = new Dictionary<string, IConvertible>();
+                for ( int c = 0; c < table.Columns.Length; c++ ) {
+                    ResultColumn column = table.Columns.ElementAt( c );
+                    res[column.Name] = (IConvertible)column.Data.GetValue( r );
+                }
+                yield return res;
+            }
         }
     }
 }

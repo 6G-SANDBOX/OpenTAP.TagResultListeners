@@ -2,12 +2,11 @@
 // Copyright:   Copyright 2019-2020 Universidad de Málaga (University of Málaga), Spain
 
 using System;
-using OpenTap;
 using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Tap.Plugins.UMA.ResultListeners
+namespace OpenTap.Plugins.UMA.ResultListeners
 {
     public class DateTimeOverride {
         [Display( "Result Name", Order: 1 )]
