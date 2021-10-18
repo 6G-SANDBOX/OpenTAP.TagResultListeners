@@ -18,43 +18,6 @@ using Tap.Plugins.UMA.Extensions;
 
 namespace Tap.Plugins.UMA.ResultListeners
 {
-    public class Override
-    {
-        [Display("Result Name", Order:1)]
-        public string ResultName { get; set; }
-
-        [Display("Column Name 1", Order: 2)]
-        public string Column1 { get; set; }
-
-        [Display("DateTime Format 1", Order: 3)]
-        public string Format1 { get; set; }
-
-        [Display("Column Name 2", Order: 4)]
-        public string Column2 { get; set; }
-
-        [Display("DateTime Format 2", Order: 5)]
-        public string Format2 { get; set; }
-
-        public Override() { }
-
-        public DateTime? Parse(Dictionary<string, IConvertible> row)
-        {
-            if (!row.Keys.Contains(Column1) || (!string.IsNullOrWhiteSpace(Column2) && !row.Keys.Contains(Column2)))
-            {
-                return null;
-            }
-
-            string completeFormat = $"{Format1}||{Format2}";
-            string completeValue = $"{row[Column1]}||{(string.IsNullOrWhiteSpace(Column2)? "" : row[Column2])}";
-
-            if (DateTime.TryParseExact(completeValue, completeFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime result))
-            {
-                return result.ToUniversalTime();
-            }
-            else { return null; }
-        }
-    }
-
     [Display("InfluxDB", Group: "UMA", Description: "InfluxDB result listener")]
     public class InfluxDbResultListener : ConfigurableResultListenerBase
     {
@@ -99,7 +62,7 @@ namespace Tap.Plugins.UMA.ResultListeners
             Description: "Allows the use of certain result columns to be parsed for generating\n" +
                          "the row timestamp. Assumes that the result uses the Local timestamp\n" + 
                          "instead of UTC.")]
-        public List<Override> Overrides { get; set; }
+        public List<DateTimeOverride> Overrides { get; set; }
 
         #endregion
 
@@ -116,7 +79,7 @@ namespace Tap.Plugins.UMA.ResultListeners
             Password = new SecureString();
             LogLevels = LogLevel.Info | LogLevel.Warning | LogLevel.Error;
             SetExecutionId = false;
-            Overrides = new List<Override>();
+            Overrides = new List<DateTimeOverride>();
         }
 
         public override void Open()
@@ -161,7 +124,7 @@ namespace Tap.Plugins.UMA.ResultListeners
             int ignored = 0, count = 0;
             string sanitizedName = Sanitize(result.Name, "_");
 
-            Override timestampParser = Overrides.Where((over) => (over.ResultName == result.Name)).FirstOrDefault();
+            DateTimeOverride timestampParser = Overrides.Where((over) => (over.ResultName == result.Name)).FirstOrDefault();
             
             foreach (Dictionary<string, IConvertible> row in getRows(result))
             {
