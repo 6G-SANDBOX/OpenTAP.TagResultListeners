@@ -135,6 +135,7 @@ namespace OpenTap.Plugins.UMA.ResultListeners
                          *  cell in the table.
                          *  - Empty values (cells) are not sent at all.
                          *  - Values not configured in MqttOverrides are ignored.
+                         *  - "origin" and "unit" are sent only if defined in MqttOverrides
                          */
 
                         if ( item.Value != null ) // Do not send empty keys
@@ -145,8 +146,8 @@ namespace OpenTap.Plugins.UMA.ResultListeners
                             if ( mqttData != null ) {
                                 Dictionary<string, object> single = new Dictionary<string, object>();
                                 single["type"] = string.IsNullOrWhiteSpace(mqttData.Type) ? item.Key : mqttData.Type;
-                                single["unit"] = mqttData.Unit;
-                                single["origin"] = mqttData.Origin;
+                                if ( !string.IsNullOrWhiteSpace( mqttData.Unit ) ) { single["unit"] = mqttData.Unit; }
+                                if ( !string.IsNullOrWhiteSpace( mqttData.Origin ) ) { single["origin"] = mqttData.Origin; }
                                 single["timestamp"] = maybeDatetime.Value;
                                 single["value"] = item.Value;
 
