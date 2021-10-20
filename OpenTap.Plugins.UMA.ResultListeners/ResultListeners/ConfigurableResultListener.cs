@@ -20,7 +20,9 @@ namespace OpenTap.Plugins.UMA.ResultListeners
         [Display("Set Execution ID", Group: "Metadata", Order: 99.0,
             Description: "Add an extra 'ExecutionId' identifier to the results. The value for\n" +
                          "this identifier must be set by the 'Set Execution ID' step at some point\n" +
-                         "before the end of the testplan run.")]
+                         "before the end of the testplan run. The 'experiment_id' value on MQTT \n" +
+                         "Publisher ResultListeners uses the same 'ExecutionId', and is always \n" +
+                         "set, regardless of this configuration.")]
         public bool SetExecutionId { get; set; }
 
         [Display("Add Iteration Number", Group: "Metadata", Order: 99.1,

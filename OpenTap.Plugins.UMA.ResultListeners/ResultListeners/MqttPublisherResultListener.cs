@@ -26,6 +26,8 @@ namespace OpenTap.Plugins.UMA.ResultListeners
     {
         private bool executionIdWarning = false;
 
+        private RestClient client = null;
+
         #region Settings
 
         [Display("Address", Group: "Publisher", Order: 1.0)]
@@ -47,7 +49,17 @@ namespace OpenTap.Plugins.UMA.ResultListeners
 
         #endregion
 
-        RestClient client = null;
+        #region Metadata
+
+        public string UseCase { get; set; }
+
+        public string TestbedId { get; set; }
+
+        public string ScenarioId { get; set; }
+
+        public string NetAppId { get; set; }
+
+        #endregion
 
         public MqttPublisherResultListener( )
         {
@@ -69,6 +81,7 @@ namespace OpenTap.Plugins.UMA.ResultListeners
         {
             base.Open();
             this.client = new RestClient( $"http{( Https ? "s" : "" )}://{Address}:{Port}/" );
+            this.UseCase = this.TestbedId = this.ScenarioId = this.NetAppId = string.Empty;
         }
 
         public override void Close()
@@ -91,11 +104,11 @@ namespace OpenTap.Plugins.UMA.ResultListeners
 
             if (SetExecutionId && !executionIdWarning && string.IsNullOrEmpty(ExecutionId))
             {
-                Log.Warning($"{Name}: Results published before setting Execution Id");
+                Log.Error($"{Name}: Results published before setting Execution Id. No results will be handled.");
                 executionIdWarning = true;
             }
 
-            string sanitizedName = Sanitize(result.Name, "_");
+            if ( string.IsNullOrEmpty( ExecutionId ) ) { return; }
 
             Dictionary<string, object> payload = new Dictionary<string, object>();
             payload["category"] = "experiment";
@@ -103,6 +116,11 @@ namespace OpenTap.Plugins.UMA.ResultListeners
             var payloadData = getPayloadData( result );
             if ( payloadData.Count != 0 ) {
                 payload["data"] = payloadData;
+                payload["experiment_id"] = ExecutionId;
+                payload["use_case_id"] = this.UseCase;
+                payload["testbed_id"] = this.TestbedId;
+                payload["scenario_id"] = this.ScenarioId;
+                payload["netapp_id"] = this.NetAppId;
 
                 RestRequest request = new RestRequest( "publish", Method.POST, DataFormat.Json );
                 request.AddJsonBody( payload );
