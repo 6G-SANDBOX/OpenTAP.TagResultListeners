@@ -102,36 +102,37 @@ namespace OpenTap.Plugins.UMA.ResultListeners
             result = ProcessResult(result);
             if (result == null) { return; }
 
-            if (SetExecutionId && !executionIdWarning && string.IsNullOrEmpty(ExecutionId))
-            {
-                Log.Error($"{Name}: Results published before setting Execution Id. No results will be handled.");
-                executionIdWarning = true;
-            }
-
-            if ( string.IsNullOrEmpty( ExecutionId ) ) { return; }
-
-            Dictionary<string, object> payload = new Dictionary<string, object>();
-            payload["category"] = "experiment";
-
-            var payloadData = getPayloadData( result );
-            if ( payloadData.Count != 0 ) {
-                payload["data"] = payloadData;
-                payload["experiment_id"] = ExecutionId;
-                payload["use_case_id"] = this.UseCase;
-                payload["testbed_id"] = this.TestbedId;
-                payload["scenario_id"] = this.ScenarioId;
-                payload["netapp_id"] = this.NetAppId;
-
-                RestRequest request = new RestRequest( "publish", Method.POST, DataFormat.Json );
-                request.AddJsonBody( payload );
-
-                IRestResponse<MqttPublisherReply> response = client.Execute<MqttPublisherReply>( request, Method.POST );
-                if ( !response.IsSuccessful ) {
-                    string message = response.Data != null ? response.Data.Message : response.ErrorMessage;
-                    Log.Error( $"Exception while connecting with Publisher ({response.StatusCode}): {message}" );
+            if ( string.IsNullOrWhiteSpace( ExecutionId ) ) {
+                if ( !executionIdWarning ) {
+                    Log.Error( $"{Name}: Results published before setting Execution Id. No results will be handled." );
+                    executionIdWarning = true;
                 }
+
+                return;
             } else {
-                Log.Warning( $"Could not retrieve any publishable results from {result.Name} table." );
+                Dictionary<string, object> payload = new Dictionary<string, object>();
+                payload["category"] = "experiment";
+
+                var payloadData = getPayloadData( result );
+                if ( payloadData.Count != 0 ) {
+                    payload["data"] = payloadData;
+                    payload["experiment_id"] = ExecutionId;
+                    payload["use_case_id"] = this.UseCase;
+                    payload["testbed_id"] = this.TestbedId;
+                    payload["scenario_id"] = this.ScenarioId;
+                    payload["netapp_id"] = this.NetAppId;
+
+                    RestRequest request = new RestRequest( "publish", Method.POST, DataFormat.Json );
+                    request.AddJsonBody( payload );
+
+                    IRestResponse<MqttPublisherReply> response = client.Execute<MqttPublisherReply>( request, Method.POST );
+                    if ( !response.IsSuccessful ) {
+                        string message = response.Data != null ? response.Data.Message : response.ErrorMessage;
+                        Log.Error( $"Exception while connecting with Publisher ({response.StatusCode}): {message}" );
+                    }
+                } else {
+                    Log.Warning( $"Could not retrieve any publishable results from {result.Name} table." );
+                }
             }
 
             OnActivity();
