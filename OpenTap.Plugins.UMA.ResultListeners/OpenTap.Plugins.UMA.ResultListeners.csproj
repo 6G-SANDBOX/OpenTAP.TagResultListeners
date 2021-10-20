@@ -30,6 +30,7 @@
   <ItemGroup>
     <PackageReference Include="InfluxDB.LineProtocol" Version="1.1.1" />
     <PackageReference Include="OpenTAP" Version="9.12.2" />
+    <PackageReference Include="RestSharp" Version="106.12.0" />
   </ItemGroup>
 
 </Project>
