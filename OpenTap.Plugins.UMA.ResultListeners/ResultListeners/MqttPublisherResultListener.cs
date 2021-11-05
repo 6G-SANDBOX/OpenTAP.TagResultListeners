@@ -4,65 +4,57 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.ComponentModel;
-using System.IO;
-using OpenTap;
-
-using InfluxDB.LineProtocol.Client;
-using InfluxDB.LineProtocol.Payload;
-using System.Security;
-using System.Globalization;
-
-using OpenTap.Plugins.UMA.Extensions;
-
+using System.Xml.Serialization;
 using RestSharp;
-using RestSharp.Extensions;
 
-namespace OpenTap.Plugins.UMA.ResultListeners
-{
-    [Display("MQTTPublisher", Group: "UMA", Description: "MQTT publisher result listener")]
-    public class MqttPublisherResultListener : ConfigurableResultListenerBase
-    {
+namespace OpenTap.Plugins.UMA.ResultListeners {
+    [Display( "MQTTPublisher", Group: "UMA", Description: "MQTT publisher result listener" )]
+    public class MqttPublisherResultListener : ConfigurableResultListenerBase {
         private bool executionIdWarning = false;
 
         private RestClient client = null;
 
         #region Settings
 
-        [Display("Address", Group: "Publisher", Order: 1.0)]
+        [Display( "Address", Group: "Publisher", Order: 1.0 )]
         public string Address { get; set; }
 
-        [Display("Port", Group: "Publisher", Order: 1.1)]
+        [Display( "Port", Group: "Publisher", Order: 1.1 )]
         public int Port { get; set; }
 
         [Display( "HTTPS", Group: "Publisher", Order: 1.2 )]
         public bool Https { get; set; }
 
-        [Display("DateTime overrides", Group: "Result Timestamps", Order: 4.0,
+        [Display( "MQTT metadata overrides", Group: "Publisher", Order: 1.3,
+            Description: "Metadata assigned to each kind of measurement. Results that do not appear\n" +
+                         "in this table will not be sent to the MQTT Publisher." )]
+        public List<MqttPublisherOverride> MqttOverrides { get; set; }
+
+        [Display( "DateTime overrides", Group: "Result Timestamps", Order: 2.0,
             Description: "Allows the use of certain result columns to be parsed for generating\n" +
                          "the row timestamp. Assumes that the result uses the Local timestamp\n" +
-                         "instead of UTC.")]
+                         "instead of UTC." )]
         public List<DateTimeOverride> DateOverrides { get; set; }
-
-        public List<MqttPublisherOverride> MqttOverrides { get; set; }
 
         #endregion
 
         #region Metadata
 
+        [XmlIgnore]
         public string UseCase { get; set; }
 
+        [XmlIgnore]
         public string TestbedId { get; set; }
 
+        [XmlIgnore]
         public string ScenarioId { get; set; }
 
+        [XmlIgnore]
         public string NetAppId { get; set; }
 
         #endregion
 
-        public MqttPublisherResultListener( )
-        {
+        public MqttPublisherResultListener( ) {
             Name = "PUBL";
 
             Address = "localhost";
@@ -77,30 +69,26 @@ namespace OpenTap.Plugins.UMA.ResultListeners
             Rules.Add( ( ) => ( Port > 0 ), "Please select a valid port number", "Port" );
         }
 
-        public override void Open()
-        {
+        public override void Open( ) {
             base.Open();
             this.client = new RestClient( $"http{( Https ? "s" : "" )}://{Address}:{Port}/" );
             this.UseCase = this.TestbedId = this.ScenarioId = this.NetAppId = string.Empty;
         }
 
-        public override void Close()
-        {
+        public override void Close( ) {
             this.client = null;
             base.Close();
         }
 
-        public override void OnTestPlanRunStart(TestPlanRun planRun)
-        {
-            base.OnTestPlanRunStart(planRun);
+        public override void OnTestPlanRunStart( TestPlanRun planRun ) {
+            base.OnTestPlanRunStart( planRun );
 
             executionIdWarning = false;
         }
 
-        public override void OnResultPublished(Guid stepRun, ResultTable result)
-        {
-            result = ProcessResult(result);
-            if (result == null) { return; }
+        public override void OnResultPublished( Guid stepRun, ResultTable result ) {
+            result = ProcessResult( result );
+            if ( result == null ) { return; }
 
             if ( string.IsNullOrWhiteSpace( ExecutionId ) ) {
                 if ( !executionIdWarning ) {
@@ -164,7 +152,7 @@ namespace OpenTap.Plugins.UMA.ResultListeners
 
                             if ( mqttData != null ) {
                                 Dictionary<string, object> single = new Dictionary<string, object>();
-                                single["type"] = string.IsNullOrWhiteSpace(mqttData.Type) ? item.Key : mqttData.Type;
+                                single["type"] = string.IsNullOrWhiteSpace( mqttData.Type ) ? item.Key : mqttData.Type;
                                 if ( !string.IsNullOrWhiteSpace( mqttData.Unit ) ) { single["unit"] = mqttData.Unit; }
                                 if ( !string.IsNullOrWhiteSpace( mqttData.Origin ) ) { single["origin"] = mqttData.Origin; }
                                 single["timestamp"] = maybeDatetime.Value;
