@@ -4,7 +4,7 @@
 using System;
 using System.Text.RegularExpressions;
 
-namespace Tap.Plugins.UMA.ResultListeners
+namespace OpenTap.Plugins.UMA.ResultListeners
 {
     public class LogMessage
     {

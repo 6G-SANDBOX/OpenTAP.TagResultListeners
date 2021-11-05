@@ -5,7 +5,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Security;
 
-namespace Tap.Plugins.UMA.Extensions
+namespace OpenTap.Plugins.UMA.Extensions
 {
     public static class SecureStringExtensions
     {

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Tap.Plugins.UMA.ResultListeners
+namespace OpenTap.Plugins.UMA.ResultListeners
 {
     [Flags]
     public enum LogLevel

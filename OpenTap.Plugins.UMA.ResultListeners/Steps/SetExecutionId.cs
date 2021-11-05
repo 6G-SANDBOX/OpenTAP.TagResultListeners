@@ -5,9 +5,9 @@
 using System.Collections.Generic;
 using OpenTap;
 
-using Tap.Plugins.UMA.ResultListeners;
+using OpenTap.Plugins.UMA.ResultListeners;
 
-namespace Tap.Plugins.UMA.Steps
+namespace OpenTap.Plugins.UMA.Steps
 {
     [Display("Set Execution ID", Groups: new string[] { "UMA", "Misc" }, 
              Description: "Sets the Execution ID on compatible result listeners. For setting\n"+

@@ -5,9 +5,9 @@
 using OpenTap;
 using System;
 using System.Xml.Serialization;
-using Tap.Plugins.UMA.ResultListeners;
+using OpenTap.Plugins.UMA.ResultListeners;
 
-namespace Tap.Plugins.UMA.Steps
+namespace OpenTap.Plugins.UMA.Steps
 {
     [Display("Mark Start of Iteration",
         Groups: new string[] { "UMA", "Misc" },
