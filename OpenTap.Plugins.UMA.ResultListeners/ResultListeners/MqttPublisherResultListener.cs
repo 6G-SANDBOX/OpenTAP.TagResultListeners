@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
 using RestSharp;
+using OpenTap.Plugins.UMA.Extensions;
 
 namespace OpenTap.Plugins.UMA.ResultListeners {
     [Display( "MQTTPublisher", Group: "UMA", Description: "MQTT publisher result listener" )]
@@ -127,14 +128,20 @@ namespace OpenTap.Plugins.UMA.ResultListeners {
         }
 
         private List<Dictionary<string, object>> getPayloadData( ResultTable result ) {
+            Log.Debug($">>getPayloadData {result.Name}");
             DateTimeOverride timestampParser = DateOverrides.Where( ( over ) => ( over.ResultName == result.Name ) ).FirstOrDefault();
 
             List<Dictionary<string, object>> data = new List<Dictionary<string, object>>();
 
+            Log.Debug($"  HasTimestampParser -> {timestampParser != null}");
             foreach ( Dictionary<string, IConvertible> row in getRows( result ) ) {
+                Log.Debug($"    Keys: {string.Join(",", row.Keys)}");
+
                 DateTime? maybeDatetime = timestampParser != null ? timestampParser.Parse( row ) : getDateTime( row );
-                if ( maybeDatetime.HasValue ) {
-                    foreach ( KeyValuePair<string, IConvertible> item in row ) {
+                if (maybeDatetime.HasValue)
+                {
+                    foreach (KeyValuePair<string, IConvertible> item in row)
+                    {
                         /* 
                          * The specific details of what to send in corner cases should be agreed with the Analytics team. Right now:
                          *  - NaN and Infinity are sent unchecked, see the InfluxDb result listener for possible checks against this.
@@ -144,26 +151,37 @@ namespace OpenTap.Plugins.UMA.ResultListeners {
                          *  - Values not configured in MqttOverrides are ignored.
                          *  - "origin" and "unit" are sent only if defined in MqttOverrides
                          */
-
-                        if ( item.Value != null ) // Do not send empty keys
+                        Log.Debug($"      Item: {item.Value}");
+                        if (item.Value != null) // Do not send empty keys
                         {
                             MqttPublisherOverride mqttData = MqttOverrides.Where(
-                                ( over ) => ( over.ResultName == result.Name && over.Column == item.Key ) ).FirstOrDefault();
+                                (over) => (over.ResultName == result.Name && over.Column == item.Key)).FirstOrDefault();
 
-                            if ( mqttData != null ) {
+                            if (mqttData != null)
+                            {
                                 Dictionary<string, object> single = new Dictionary<string, object>();
-                                single["type"] = string.IsNullOrWhiteSpace( mqttData.Type ) ? item.Key : mqttData.Type;
-                                if ( !string.IsNullOrWhiteSpace( mqttData.Unit ) ) { single["unit"] = mqttData.Unit; }
-                                if ( !string.IsNullOrWhiteSpace( mqttData.Origin ) ) { single["origin"] = mqttData.Origin; }
-                                single["timestamp"] = maybeDatetime.Value;
+                                single["type"] = string.IsNullOrWhiteSpace(mqttData.Type) ? item.Key : mqttData.Type;
+                                if (!string.IsNullOrWhiteSpace(mqttData.Unit)) { single["unit"] = mqttData.Unit; }
+                                if (!string.IsNullOrWhiteSpace(mqttData.Origin)) { single["origin"] = mqttData.Origin; }
+                                single["timestamp"] = maybeDatetime.Value.ToUnixUtcTimestamp();
                                 single["value"] = item.Value;
 
-                                data.Add( single );
+                                data.Add(single);
+                                Log.Debug($"        Added: {string.Join("; ", single)}");
+                            }
+                            else
+                            {
+                                Log.Debug($"        Not in overrides");
                             }
                         }
                     }
                 }
+                else
+                {
+                    Log.Debug("      Timestamp not found");
+                }
             }
+            Log.Debug("<<getPayloadData");
 
             return data;
         }
