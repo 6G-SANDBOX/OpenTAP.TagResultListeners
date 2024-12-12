@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using OpenTap;
 
-namespace OpenTap.InfluxDb.ResultListeners
+namespace OpenTap.TagResultListeners.ResultListeners
 {
     public abstract class ConfigurableResultListenerBase : ResultListener
     {

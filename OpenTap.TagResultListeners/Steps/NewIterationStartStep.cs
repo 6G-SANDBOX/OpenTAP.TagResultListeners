@@ -5,12 +5,12 @@
 using OpenTap;
 using System;
 using System.Xml.Serialization;
-using OpenTap.InfluxDb.ResultListeners;
+using OpenTap.TagResultListeners.ResultListeners;
 
-namespace OpenTap.Plugins.UMA.Steps
+namespace OpenTap.TagResultListeners.Steps
 {
     [Display("Mark Start of Iteration",
-        Groups: new string[] { "UMA", "Misc" },
+        Group: "Tag Result Listeners",
         Description: "Marks the start of a new iteration")]
     public class NewIterationStartStep : TestStep
     {

@@ -5,11 +5,11 @@ using System;
 using System.Collections.Generic;
 using OpenTap;
 
-using OpenTap.InfluxDb.Extensions;
+using OpenTap.TagResultListeners.Extensions;
 
-namespace OpenTap.Plugins.UMA.Steps
+namespace OpenTap.TagResultListeners.Steps
 {
-    [Display("Set Execution Metadata", Groups: new string[] { "UMA", "Misc" },
+    [Display("Set Execution Metadata", Group: "Tag Result Listeners",
              Description: "Sets the Execution ID on compatible result listeners Additional\n"+
                           "metadata will be saved on the 'execution_metadata' result.")]
     public class SetExecutionMetadataStep : SetExecutionIdStep

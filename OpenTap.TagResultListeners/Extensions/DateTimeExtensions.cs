@@ -3,7 +3,7 @@
 
 using System;
 
-namespace OpenTap.InfluxDb.Extensions
+namespace OpenTap.TagResultListeners.Extensions
 {
     public static class DateTimeExtensions
     {

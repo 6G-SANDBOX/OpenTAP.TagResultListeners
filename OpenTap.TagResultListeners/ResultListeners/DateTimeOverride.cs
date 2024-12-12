@@ -6,7 +6,7 @@ using System.Globalization;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace OpenTap.InfluxDb.ResultListeners
+namespace OpenTap.TagResultListeners.ResultListeners
 {
     public class DateTimeOverride {
         [Display( "Result Name", Order: 1 )]
