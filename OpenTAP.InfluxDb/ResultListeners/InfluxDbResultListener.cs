@@ -123,6 +123,8 @@ namespace OpenTap.InfluxDb.ResultListeners
             string sanitizedName = Sanitize(result.Name, "_");
 
             using (WriteApi writer = client.GetWriteApi()) {
+                writer.EventHandler += writerEventHandler;
+
                 DateTimeOverride timestampParser = Overrides.Where((over) => (over.ResultName == result.Name)).FirstOrDefault();
 
                 PointData builder = PointData.Measurement(sanitizedName);
@@ -164,6 +166,36 @@ namespace OpenTap.InfluxDb.ResultListeners
             }
 
             OnActivity();
+        }
+
+        private void writerEventHandler(object sender, EventArgs e)
+        {
+            string message = null;
+            string point = null;
+            switch (e)
+            {
+                // success response from server
+                case WriteSuccessEvent _:
+                    break;
+                case WriteErrorEvent error:
+                    message = $"WriteError: {error.Exception.Message}";
+                    point = error.LineProtocol;
+                    break;
+                case WriteRetriableErrorEvent error:
+                    message = $"WriteRetriableError: {error.Exception.Message}";
+                    point = error.LineProtocol;
+                    break;
+                case WriteRuntimeExceptionEvent error:
+                    message = $"WriteRuntimeException: {error.Exception.Message}";
+                    break;
+            }
+
+            if (message != null) {
+                Log.Error(message);
+                if (point != null) {
+                    Log.Debug($"Point data: {point}");
+                }
+            }
         }
 
         private Dictionary<string, string> getTags(params string[] extra)
