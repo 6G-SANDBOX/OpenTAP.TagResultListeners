@@ -5,7 +5,7 @@
 using OpenTap;
 using System;
 using System.Xml.Serialization;
-using OpenTap.Plugins.UMA.ResultListeners;
+using OpenTap.InfluxDb.ResultListeners;
 
 namespace OpenTap.Plugins.UMA.Steps
 {

@@ -5,8 +5,7 @@ using System;
 using System.Collections.Generic;
 using OpenTap;
 
-using OpenTap.Plugins.UMA.Extensions;
-using OpenTap.Plugins.UMA.ResultListeners;
+using OpenTap.InfluxDb.Extensions;
 
 namespace OpenTap.Plugins.UMA.Steps
 {
@@ -16,8 +15,6 @@ namespace OpenTap.Plugins.UMA.Steps
     public class SetExecutionMetadataStep : SetExecutionIdStep
     {
         #region Settings
-
-        #region Metadata Table
 
         [Display( "Publish metadata table", Order: 2.1, Group: "Metadata table" )]
         public bool MetadataTable { get; set; }
@@ -40,37 +37,11 @@ namespace OpenTap.Plugins.UMA.Steps
 
         #endregion
 
-        #region MqttPublisher
-
-        [Display( "Configure MQTT Publisher", Order: 3.1, Group: "MQTT Publisher" )]
-        public bool ConfigureMqtt { get; set; }
-
-        [Display( "Use Case", Order: 3.2, Group: "MQTT Publisher" )]
-        [EnabledIf( "ConfigureMqtt", true, HideIfDisabled = true )]
-        public string MqttUseCase { get; set; }
-
-        [Display( "Testbed Id", Order: 3.3, Group: "MQTT Publisher" )]
-        [EnabledIf( "ConfigureMqtt", true, HideIfDisabled = true )]
-        public string MqttTestbed { get; set; }
-
-        [Display( "Scenario Id", Order: 3.4, Group: "MQTT Publisher" )]
-        [EnabledIf( "ConfigureMqtt", true, HideIfDisabled = true )]
-        public string MqttScenario { get; set; }
-
-        [Display( "NetApp Id", Order: 3.5, Group: "MQTT Publisher" )]
-        [EnabledIf( "ConfigureMqtt", true, HideIfDisabled = true )]
-        public string MqttNetApp { get; set; }
-
-        #endregion
-
-        #endregion
-
         private static List<string> columns = new List<string> { "Timestamp", "Date", "Time", "Slice", "Scenario", "TestCases", "Notes" };
 
         public SetExecutionMetadataStep()
         {
             Slice = Scenario = TestCases = string.Empty;
-            MqttUseCase = MqttTestbed = MqttScenario = MqttNetApp = string.Empty;
             Notes = "Test execution";
         }
 
@@ -89,33 +60,6 @@ namespace OpenTap.Plugins.UMA.Steps
                 Log.Info( "Experiment metadata: " );
                 for ( int i = 0; i < columns.Count; i++ ) {
                     Log.Info( $"  {columns[i]}: {values[i]}" );
-                }
-            }
-
-            if ( ConfigureMqtt ) {
-                bool found = false;
-                foreach ( ConfigurableResultListenerBase resultListener in ResultListeners ) {
-                    MqttPublisherResultListener mqtt = resultListener as MqttPublisherResultListener;
-
-                    if ( mqtt != null ) {
-                        mqtt.UseCase = this.MqttUseCase;
-                        mqtt.TestbedId = this.MqttTestbed;
-                        mqtt.ScenarioId = this.MqttScenario;
-                        mqtt.NetAppId = this.MqttNetApp;
-
-                        Log.Info( $"Setting MQTT Metadata to '{resultListener.Name}'" );
-                        found = true;
-                    }
-                }
-
-                if ( !found ) {
-                    Log.Warning( "Could not find any MqttPublisherResultListener instance to configure." );
-                } else {
-                    Log.Info( "MQTT Metadata:" );
-                    Log.Info( $"  'use_case_id': '{this.MqttUseCase}'" );
-                    Log.Info( $"  'testbed_id': '{this.MqttTestbed}'" );
-                    Log.Info( $"  'scenario_id': '{this.MqttScenario}'" );
-                    Log.Info( $"  'netapp_id': '{this.MqttNetApp}'" );
                 }
             }
         }

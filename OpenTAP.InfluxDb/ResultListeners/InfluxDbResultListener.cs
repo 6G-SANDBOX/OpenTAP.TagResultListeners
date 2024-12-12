@@ -14,9 +14,9 @@ using InfluxDB.LineProtocol.Payload;
 using System.Security;
 using System.Globalization;
 
-using OpenTap.Plugins.UMA.Extensions;
+using OpenTap.InfluxDb.Extensions;
 
-namespace OpenTap.Plugins.UMA.ResultListeners
+namespace OpenTap.InfluxDb.ResultListeners
 {
     [Display("InfluxDB", Group: "UMA", Description: "InfluxDB result listener")]
     public class InfluxDbResultListener : ConfigurableResultListenerBase

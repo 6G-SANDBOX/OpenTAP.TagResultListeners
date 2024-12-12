@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenTAP.InfluxDb", "OpenTAP.InfluxDb\OpenTAP.InfluxDb.csproj", "{A52363B6-A191-4F82-895D-FCDEACE67762}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A52363B6-A191-4F82-895D-FCDEACE67762}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A52363B6-A191-4F82-895D-FCDEACE67762}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A52363B6-A191-4F82-895D-FCDEACE67762}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A52363B6-A191-4F82-895D-FCDEACE67762}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D538FFBC-8F7C-41D5-BB1A-1530371B82D9}
+	EndGlobalSection
+EndGlobal

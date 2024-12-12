@@ -4,7 +4,7 @@
 using OpenTap;
 using System;
 
-namespace OpenTap.Plugins.UMA.ResultListeners
+namespace OpenTap.InfluxDb.ResultListeners
 {
     /// <summary>
     /// Special type of result that marks the start of a new iteration.

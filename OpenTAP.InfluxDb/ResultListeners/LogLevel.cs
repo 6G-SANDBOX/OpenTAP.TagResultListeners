@@ -3,7 +3,7 @@
 
 using System;
 
-namespace OpenTap.Plugins.UMA.ResultListeners
+namespace OpenTap.InfluxDb.ResultListeners
 {
     [Flags]
     public enum LogLevel
