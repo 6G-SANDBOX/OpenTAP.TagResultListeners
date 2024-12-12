@@ -9,19 +9,19 @@ using System.ComponentModel;
 using System.IO;
 using OpenTap;
 
-using InfluxDB.LineProtocol.Client;
-using InfluxDB.LineProtocol.Payload;
+using InfluxDB.Client;
 using System.Security;
 using System.Globalization;
 
 using OpenTap.InfluxDb.Extensions;
+using InfluxDB.Client.Writes;
 
 namespace OpenTap.InfluxDb.ResultListeners
 {
     [Display("InfluxDB", Group: "UMA", Description: "InfluxDB result listener")]
     public class InfluxDbResultListener : ConfigurableResultListenerBase
     {
-        private LineProtocolClient client = null;
+        private InfluxDBClient client = null;
         private DateTime startTime;
         private Dictionary<string, string> baseTags = null;
         private bool executionIdWarning = false;
@@ -34,14 +34,14 @@ namespace OpenTap.InfluxDb.ResultListeners
         [Display("Port", Group: "InfluxDB", Order: 1.1)]
         public int Port { get; set; }
 
-        [Display("Database", Group: "InfluxDB", Order: 1.2)]
-        public string Database { get; set; }
+        [Display("Bucket", Group: "InfluxDB", Order: 1.2)]
+        public string Bucket { get; set; }
 
-        [Display("User", Group: "InfluxDB", Order: 1.3)]
-        public string User { get; set; }
+        [Display("Org", Group: "InfluxDB", Order: 1.3)]
+        public string Org { get; set; }
 
-        [Display("Password", Group: "InfluxDB", Order: 1.4)]
-        public SecureString Password { get; set; }
+        [Display("Token", Group: "InfluxDB", Order: 1.4)]
+        public SecureString Token { get; set; }
 
         [Display("Save log messages", Group: "InfluxDB", Order: 1.5, 
             Description: "Send TAP log messages to InfluxDB after testplan execution.")]
@@ -66,17 +66,16 @@ namespace OpenTap.InfluxDb.ResultListeners
 
         #endregion
 
-
         public InfluxDbResultListener()
         {
-            Name = "INFLUX";
+            Name = "INFLUX2";
 
             Address = "localhost";
             Port = 8086;
-            Database = "mydb";
-            HandleLog = true;
-            User =  Facility = HostIP = string.Empty;
-            Password = new SecureString();
+            Bucket = "mybucket";
+            HandleLog = false;
+            Org =  Facility = HostIP = string.Empty;
+            Token = new SecureString();
             LogLevels = LogLevel.Info | LogLevel.Warning | LogLevel.Error;
             SetExecutionId = false;
             Overrides = new List<DateTimeOverride>();
@@ -85,7 +84,7 @@ namespace OpenTap.InfluxDb.ResultListeners
         public override void Open()
         {
             base.Open();
-            this.client = new LineProtocolClient(new Uri($"http://{Address}:{Port}"), Database, User, Password.GetString());
+            this.client = new InfluxDBClient($"http://{Address}:{Port}?org={Org}&bucket={Bucket}&token={Token.GetString()}");
         }
 
         public override void Close()
@@ -120,82 +119,51 @@ namespace OpenTap.InfluxDb.ResultListeners
                 executionIdWarning = true;
             }
 
-            LineProtocolPayload payload = new LineProtocolPayload();
             int ignored = 0, count = 0;
             string sanitizedName = Sanitize(result.Name, "_");
 
-            DateTimeOverride timestampParser = Overrides.Where((over) => (over.ResultName == result.Name)).FirstOrDefault();
-            
-            foreach (Dictionary<string, IConvertible> row in getRows(result))
-            {
-                DateTime? maybeDatetime = timestampParser != null ? timestampParser.Parse(row) : getDateTime(row);
-                if (maybeDatetime.HasValue)
+            using (WriteApi writer = client.GetWriteApi()) {
+                DateTimeOverride timestampParser = Overrides.Where((over) => (over.ResultName == result.Name)).FirstOrDefault();
+
+                PointData builder = PointData.Measurement(sanitizedName);
+                foreach (KeyValuePair<string, string> tag in this.getTags()) {
+                    builder = builder.Tag(tag.Key, tag.Value);
+                }
+
+                List<PointData> points = new List<PointData>();
+
+                foreach (Dictionary<string, IConvertible> row in getRows(result))
                 {
-                    Dictionary<string, object> fields = new Dictionary<string, object>();
-                    foreach (KeyValuePair<string, IConvertible> item in row)
+                    DateTime? maybeDatetime = timestampParser != null ? timestampParser.Parse(row) : getDateTime(row);
+                    if (maybeDatetime.HasValue)
                     {
-                        if (item.Value != null) // Null (unsent) values will appear as empty columns
+                        PointData point = builder.Timestamp(maybeDatetime.Value, InfluxDB.Client.Api.Domain.WritePrecision.Ms);
+
+                        foreach (KeyValuePair<string, IConvertible> item in row)
                         {
-                            // Avoid sending invalid values to the database
-                            if (!(item.Value.ToString() == "9.91E+37" || item.Value.ToString() == "Infinity")) 
+                            if (item.Value != null) // Null (unsent) values will appear as empty columns
                             {
-                                fields[item.Key] = item.Value;
+                                // Avoid sending invalid values to the database
+                                if (!(item.Value.ToString() == "9.91E+37" || item.Value.ToString() == "Infinity"))
+                                {
+                                    point = point.Field(item.Key, item.Value);
+                                }
                             }
                         }
-                    }
-                    payload.Add(new LineProtocolPoint(sanitizedName, fields, this.getTags(), maybeDatetime.Value));
-                    count++;
-                }
-                else { ignored++; }
-            }
+                        points.Add(point);
 
-            if (ignored != 0) { Log.Warning($"Ignored {ignored}/{result.Rows} results from table {result.Name}: Could not parse Timestamp"); }
-            this.sendPayload(payload, count, $"results ('{result.Name}'{(sanitizedName != result.Name ? $" as '{sanitizedName}'" : "")})");
+                        count++;
+                    }
+                    else { ignored++; }
+                }
+
+                if (ignored != 0) { Log.Warning($"Ignored {ignored}/{result.Rows} results from table {result.Name}: Could not parse Timestamp"); }
+
+                Log.Info($"Sending {count} results ('{result.Name}'{(sanitizedName != result.Name ? $" as '{sanitizedName}'" : "")}) to {Name}");
+                writer.WritePoints(points);
+            }
 
             OnActivity();
-        }
-
-        public override void OnTestPlanRunCompleted(TestPlanRun planRun, Stream logStream)
-        {
-            string version = PluginManager.GetOpenTapAssembly().SemanticVersion.ToString();
-            string hostName = EngineSettings.Current.StationName;
-
-            StreamReader reader = new StreamReader(logStream);
-            LineProtocolPayload payload = new LineProtocolPayload();
-            int count = 0;
-
-            string line = string.Empty;
-            while ((line = reader.ReadLine()) != null)
-            {
-                LogMessage message = LogMessage.FromLine(line);
-                if (message != null && LogLevels.HasFlag(message.Level)) 
-                {
-                    payload.Add(new LineProtocolPoint(
-                        "syslog",
-                        new Dictionary<string, object> { // fields
-                            { "message", message.Text }
-                        },
-                        this.getTags("severity", message.SeverityCode),
-                        startTime + message.Time)
-                    );
-                    count++;
-                }
-            }
-            this.sendPayload(payload, count, "log messages");
-        }
-
-        private void sendPayload(LineProtocolPayload payload, int count, string kind)
-        {
-            Log.Info($"Sending {count} {kind} to {Name}");
-            try
-            {
-                LineProtocolWriteResult result = this.client.WriteAsync(payload).GetAwaiter().GetResult();
-                if (!result.Success) { throw new Exception(result.ErrorMessage); }
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Error while sending payload: {e.Message}{(e.InnerException != null ? $" - {e.InnerException.Message}" : "")}");
-            }
         }
 
         private Dictionary<string, string> getTags(params string[] extra)

@@ -42,7 +42,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(DebugWith)' == 'Editor' AND '$(Configuration)' == 'Debug'">
-    <OpenTapPackageReference Include="Editor" version="9" />
+    <OpenTapPackageReference Include="Editor CE" version="9" />
   </ItemGroup>
 
 </Project>
