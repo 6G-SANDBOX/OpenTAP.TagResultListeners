@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+InfoLink: Specifies a location where additional information about the package can be found.
+Version: The version of the package. Must be in a semver 2.0 compatible format. This can be automatically updated from GIT.
+
+For Version the following macro is available (Only works if the project directory is under Git source control):
+$(GitVersion) - Gets the version from Git in the recommended format Major.Minor.Build-PreRelease+CommitHash.BranchName.
+-->
+<Package Name="OpenTap.TagResultListeners" xmlns="http://opentap.io/schemas/package" InfoLink="" Version="1.1.0" OS="Windows,Linux">
+	<Description>
+		A collection of Result Listeners are able to inject certain tags to every generated result. The purpose of these tags is to ease the filtering of results, in particular for situations where all results are stored together.
+		The following Result Listeners are included: InfluxDb v2.x, MultiCSV
+		<Organisation>University of Malaga</Organisation>
+	</Description>
+
+	<Owner>ITIS UMA</Owner>
+	<SourceUrl>https://gitlab.com/morse-uma/OpenTap.TagResultListeners</SourceUrl>
+	<SourceLicense>Apache-2.0</SourceLicense>
+
+	<Files>
+        <File Path="Packages/OpenTap.TagResultListeners/OpenTap.TagResultListeners.dll" SourcePath="OpenTap.TagResultListeners.dll">
+            <SetAssemblyInfo Attributes="Version"/>
+        </File>
+    </Files>
+</Package>

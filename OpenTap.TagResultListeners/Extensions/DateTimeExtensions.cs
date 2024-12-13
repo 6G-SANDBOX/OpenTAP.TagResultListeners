@@ -3,7 +3,7 @@
 
 using System;
 
-namespace OpenTap.Plugins.UMA.Extensions
+namespace OpenTap.TagResultListeners.Extensions
 {
     public static class DateTimeExtensions
     {
