@@ -57,10 +57,10 @@ namespace OpenTap.TagResultListeners.ResultListeners.MultiCsv
 
         [Display("File Path", Group: "CSV", Order: 1.2,
             Description: "CSV output path. Available macros are:\n" +
-                " - Result type: {ResultType} (Mandatory)\n" +
-                " - Run Identifier: {Identifier} (Mandatory if 'Add Identifier to Results' is enabled)\n" +
-                " - Run Verdict: {Verdict}\n" +
-                " - Run Start Time: {Date}"
+                " - Result type: " + RESULT_MACRO + " (Mandatory)\n" +
+                " - Run Identifier: " + RESULTS_ID_MACRO + " (Mandatory if 'Set Execution ID' is enabled)\n" +
+                " - Run Verdict: " + VERDICT_MACRO + "\n" +
+                " - Run Start Time: " + DATE_MACRO
             )]
         [FilePath(behavior: FilePathAttribute.BehaviorChoice.Save, fileExtension: "csv")]
         public string FilePath { get; set; }

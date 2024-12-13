@@ -16,23 +16,16 @@ namespace OpenTap.TagResultListeners.Steps
     {
         #region Settings
 
-        [Display( "Publish metadata table", Order: 2.1, Group: "Metadata table" )]
-        public bool MetadataTable { get; set; }
-
-        [Display("Slice", Order: 2.2, Group: "Metadata table")]
-        [EnabledIf("MetadataTable", true, HideIfDisabled = true)]
+        [Display("Slice", Order: 2.2, Group: "Metadata")]
         public string Slice { get; set; }
 
-        [Display("Scenario", Order: 2.3, Group: "Metadata table" )]
-        [EnabledIf( "MetadataTable", true, HideIfDisabled = true )]
+        [Display("Scenario", Order: 2.3, Group: "Metadata" )]
         public string Scenario { get; set; }
 
-        [Display("TestCases", Order: 2.4, Group: "Metadata table" )]
-        [EnabledIf( "MetadataTable", true, HideIfDisabled = true )]
+        [Display("TestCases", Order: 2.4, Group: "Metadata" )]
         public string TestCases { get; set; }
 
-        [Display("Notes", Order: 2.5, Group: "Metadata table" )]
-        [EnabledIf( "MetadataTable", true, HideIfDisabled = true )]
+        [Display("Notes", Order: 2.5, Group: "Metadata" )]
         public string Notes { get; set; }
 
         #endregion
@@ -49,18 +42,17 @@ namespace OpenTap.TagResultListeners.Steps
         {
             base.Run();
 
-            if ( MetadataTable ) {
-                DateTime now = DateTime.UtcNow;
-                IConvertible[] values = new IConvertible[] {
+            DateTime now = DateTime.UtcNow;
+            IConvertible[] values = new IConvertible[] {
                 now.ToUnixTimestamp(), now.ToShortDateString(), now.ToShortTimeString(), Slice, Scenario, TestCases, Notes
                 };
 
-                Results.Publish( "execution_metadata", columns, values );
+            Results.Publish("execution_metadata", columns, values);
 
-                Log.Info( "Experiment metadata: " );
-                for ( int i = 0; i < columns.Count; i++ ) {
-                    Log.Info( $"  {columns[i]}: {values[i]}" );
-                }
+            Log.Info("Experiment metadata: ");
+            for (int i = 0; i < columns.Count; i++)
+            {
+                Log.Info($"  {columns[i]}: {values[i]}");
             }
         }
     }
