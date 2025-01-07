@@ -6,9 +6,9 @@ Version: The version of the package. Must be in a semver 2.0 compatible format. 
 For Version the following macro is available (Only works if the project directory is under Git source control):
 $(GitVersion) - Gets the version from Git in the recommended format Major.Minor.Build-PreRelease+CommitHash.BranchName.
 -->
-<Package Name="OpenTap.TagResultListeners" xmlns="http://opentap.io/schemas/package" InfoLink="" Version="1.1.0" OS="Windows,Linux">
+<Package Name="Tag Result Listeners" xmlns="http://opentap.io/schemas/package" InfoLink="" Version="1.1.1" OS="Windows,Linux">
 	<Description>
-		A collection of Result Listeners are able to inject certain tags to every generated result. The purpose of these tags is to ease the filtering of results, in particular for situations where all results are stored together.
+		A collection of Result Listeners able to inject certain tags to every generated result. The purpose of these tags is to ease the filtering of results, in particular for situations where all results are stored together.
 		The following Result Listeners are included: InfluxDb v2.x, MultiCSV
 		<Organisation>University of Malaga</Organisation>
 	</Description>
